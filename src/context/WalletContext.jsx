@@ -48,7 +48,11 @@ export const WalletProvider = ({ children }) => {
       const net = await prov.getNetwork();
       const currentChainId = Number(net.chainId);
       setChainId(currentChainId);
-      setNetwork(net.name || TARGET_NETWORK.chainName);
+      setNetwork(
+        currentChainId === TARGET_CHAIN_ID
+          ? TARGET_NETWORK.chainName
+          : `Unknown Network (${currentChainId})`
+      );
       const correct = currentChainId === TARGET_CHAIN_ID;
       setIsCorrectNetwork(correct);
       return correct;

@@ -89,9 +89,12 @@ export function getReputationReadOnly() {
  * @returns {{ txHash: string, onChainTxId: string, receipt: object }}
  */
 export async function createEscrowTransaction(sellerAddress, amountInEther) {
+  const signer = await getSigner();
+  const nonce = await signer.getNonce('latest');
   const escrow = await getEscrowContract();
   const tx = await escrow.createTransaction(sellerAddress, {
     value: parseEther(amountInEther),
+    nonce,
   });
   const receipt = await tx.wait();
 
@@ -228,7 +231,7 @@ export function classifyContractError(err) {
   // Smart contract revert reasons
   if (combined.includes('escrow:') || combined.includes('reputation:')) {
     const match = combined.match(/(escrow:|reputation:)\s*(.+?)"/i) ||
-                  combined.match(/(escrow:|reputation:)\s*(.+)/i);
+      combined.match(/(escrow:|reputation:)\s*(.+)/i);
     if (match) return { type: 'contract', message: match[0].replace(/"/g, '') };
   }
   return { type: 'unknown', message: msg.slice(0, 200) };
